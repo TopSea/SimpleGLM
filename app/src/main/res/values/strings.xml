@@ -1,3 +1,30 @@
 <resources>
     <string name="app_name">SimpleGLM</string>
+
+    <string name="jumpBottom">Jump to bottom</string>
+    <string name="send">发送</string>
+    <string name="author_me">me</string>
+    <string name="now">8:30 PM</string>
+    <string name="textfield_hint">Message #composers</string>
+    <string name="emojis_label">Emojis</string>
+    <string name="stickers_label">Stickers</string>
+
+
+    <!-- Accessibility descriptions -->
+
+    <string name="emoji_selector_desc">Emoji selector</string>
+    <string name="emoji_selector_bt_desc">Show Emoji selector</string>
+    <string name="dm_desc">Direct Message</string>
+    <string name="attach_photo_desc">Attach Photo</string>
+    <string name="map_selector_desc">Location selector</string>
+    <string name="videochat_desc">Start videochat</string>
+    <string name="textfield_desc">Text input</string>
+    <string name="not_available">Functionality currently not available</string>
+    <string name="not_available_subtitle">Grab a beverage and check back later!</string>
+    <string name="attached_image">Attached image</string>
+
+
+    <!--MMKV字符串-->
+    <string name="server_ip">Server_IP</string>
+    <string name="voice_chat">Voice_Chat</string>
 </resources>
