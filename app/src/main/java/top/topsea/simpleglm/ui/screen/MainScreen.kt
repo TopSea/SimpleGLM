@@ -1,7 +1,5 @@
 package top.topsea.simpleglm.ui.screen
 
-import android.graphics.drawable.Icon
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -9,6 +7,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -33,12 +33,21 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import kotlinx.coroutines.launch
 import top.topsea.simpleglm.R
+import top.topsea.simpleglm.chat.ConversationUiState
+import top.topsea.simpleglm.chat.ChatMessage
+import top.topsea.simpleglm.chat.ChatMessages
+import top.topsea.simpleglm.chat.UserInput
+import top.topsea.simpleglm.chat.exampleUiState
+import top.topsea.simpleglm.settings.getCurrTime
+import top.topsea.simpleglm.settings.me
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(
     navController: NavController,
+    uiState: ConversationUiState,
     navigateToProfile: (String) -> Unit,
 ) {
     val scrollState = rememberLazyListState()
@@ -51,6 +60,29 @@ fun MainScreen(
             Modifier
                 .fillMaxSize()
                 .padding(paddingValues)) {
+            ChatMessages(
+                chatMessages = uiState.chatMessages,
+                navigateToProfile = navigateToProfile,
+                modifier = Modifier.padding(bottom = 16.dp).weight(1f),
+                scrollState = scrollState
+            )
+            UserInput(
+                onMessageSent = { content ->
+                    exampleUiState.addMessage(
+                        ChatMessage(me, content, getCurrTime())
+                    )
+                },
+                resetScroll = {
+                    scope.launch {
+                        scrollState.scrollToItem(0)
+                    }
+                },
+                // let this element handle the padding so that the elevation is shown behind the
+                // navigation bar
+                modifier = Modifier
+                    .navigationBarsPadding()
+                    .imePadding()
+            )
         }
     }
 

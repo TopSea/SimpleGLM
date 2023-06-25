@@ -13,6 +13,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import top.topsea.simpleglm.chat.exampleUiState
 import top.topsea.simpleglm.ui.screen.MainScreen
 import top.topsea.simpleglm.ui.screen.SettingScreen
 import top.topsea.simpleglm.ui.theme.SimpleGLMTheme
@@ -31,6 +32,7 @@ class MainActivity : ComponentActivity() {
                     NavHost(navController = navController, startDestination = "main_screen") {
                         composable("main_screen") {
                             MainScreen(
+                                uiState = exampleUiState,
                                 navigateToProfile = { },
                                 navController = navController,
                             )
@@ -41,21 +43,5 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
-    }
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    SimpleGLMTheme {
-        Greeting("Android")
     }
 }
