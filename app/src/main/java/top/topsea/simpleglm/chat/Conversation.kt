@@ -70,6 +70,11 @@ fun ChatMessages(
                 val firstMessageFromMe = prevAuthor == me
                 val lastMessageFromMe = nextAuthor == me
 
+                if (index == 0) {
+                    item {
+                        Spacer(modifier = Modifier.size(8.dp))
+                    }
+                }
                 // Hardcode day dividers for simplicity
 //                if (index == chatMessages.size - 1) {
 //                    item {
@@ -96,7 +101,7 @@ fun ChatMessages(
                         DroidMessageItem(
                             onAuthorClick = { name -> navigateToProfile(name) },
                             msg = content,
-                            isUserMe = content.author == droid,
+                            isUserMe = false,
                             firsMessageFromDroid = !firstMessageFromMe,
                             lastMessageFromDroid = !lastMessageFromMe
                         )

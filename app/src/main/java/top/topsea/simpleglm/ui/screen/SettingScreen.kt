@@ -182,10 +182,10 @@ fun DefaultSettings() {
                     enableServerIP = !enableServerIP
                     if (!enableServerIP) {
                         textColor = Color.Black
-                        btn ="Confirm"
+                        btn ="确认"
                     } else {
                         textColor = Color.LightGray
-                        btn ="Modify"
+                        btn ="修改"
                         kv.encode(context.resources.getString(R.string.server_ip), serverIPStr)
                     }
                 },

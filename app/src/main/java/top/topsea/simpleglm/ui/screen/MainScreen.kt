@@ -67,7 +67,7 @@ fun MainScreen(
             ChatMessages(
                 chatMessages = uiState.chatMessages,
                 navigateToProfile = navigateToProfile,
-                modifier = Modifier.padding(bottom = 16.dp).weight(1f),
+                modifier = Modifier.weight(1f),
                 scrollState = scrollState
             )
             UserInput(

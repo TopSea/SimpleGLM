@@ -173,7 +173,8 @@ private fun UserInputText(
                     .align(Alignment.CenterStart)
                     .padding(start = 16.dp),
                 text = stringResource(id = R.string.textfield_hint),
-                style = MaterialTheme.typography.bodyLarge.copy(color = disableContentColor)
+                style = MaterialTheme.typography.bodyLarge.copy(color = disableContentColor),
+                color = Color.Gray
             )
         }
     }

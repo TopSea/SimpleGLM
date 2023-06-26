@@ -17,7 +17,7 @@ import java.util.concurrent.TimeUnit
 const val time_format = "yyyy-MM-dd HH:mm:ss"
 
 const val me = "me"
-const val droid = "droid"
+const val droid = "ChatGLM-6B"
 
 @SuppressLint("SimpleDateFormat")
 fun getCurrTime(): String {
