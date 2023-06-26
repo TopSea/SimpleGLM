@@ -45,28 +45,32 @@ class StreamResponseConverter : StreamTxtResponseConverter<ChatGLMA>() {
         return glma
     }
 
-    private fun stream2String(inputStream: InputStream): String {
+    private fun stream2String(inputStream: InputStream) {
         val reader = BufferedReader(InputStreamReader(inputStream))
-        val stringBuffer = StringBuffer()
+        val response = ""
+        val responseEmoji = ""
 //        val glma = ChatGLMA(null, null, null, null, false)
         val chatA = ChatMessage(droid, mutableStateOf(""), "")
         exampleUiState.addMessage(chatA)
         try {
             reader.forEachLine { line ->
-                Log.d(TAG, "line: $line")
                 if (line.contains("data: {")){
                     val data = line.removePrefix("data: ")
+
                     val jsonData = JSONObject(data)
 //                    glma.query = jsonData.getString("query")
 //                    glma.delta = jsonData.getString("delta")
 //                    glma.response = jsonData.getString("response")
 //                    glma.finished = jsonData.getBoolean("finished")
                     if (!jsonData.getBoolean("finished")) {
-                        chatA.content.value = chatA.content.value + jsonData.getString("delta")
+                        if (jsonData.getString("delta").isEmpty()) {
+                            // 防止 Emoji 变成乱码
+                            chatA.content.value = jsonData.getString("response")
+                        } else {
+                            chatA.content.value = chatA.content.value + jsonData.getString("delta")
+                        }
                     }
-                    Log.d(TAG, "stream2String: ${jsonData.toString()}")
                 }
-                stringBuffer.append(line)
             }
         } catch (e: IOException) {
             e.printStackTrace()
@@ -77,6 +81,5 @@ class StreamResponseConverter : StreamTxtResponseConverter<ChatGLMA>() {
                 e.printStackTrace()
             }
         }
-        return stringBuffer.toString()
     }
 }
