@@ -420,7 +420,7 @@ fun ClickableMessage(
     val uriHandler = LocalUriHandler.current
 
     val styledMessage = messageFormatter(
-        text = chatMessage.content,
+        text = chatMessage.content.value,
         primary = isUserMe
     )
 

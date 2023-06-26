@@ -20,6 +20,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -34,7 +35,10 @@ import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import kotlinx.coroutines.launch
+import org.json.JSONArray
 import top.topsea.simpleglm.R
+import top.topsea.simpleglm.api.ApiExecutor
+import top.topsea.simpleglm.api.ChatGLMQ
 import top.topsea.simpleglm.chat.ConversationUiState
 import top.topsea.simpleglm.chat.ChatMessage
 import top.topsea.simpleglm.chat.ChatMessages
@@ -69,8 +73,12 @@ fun MainScreen(
             UserInput(
                 onMessageSent = { content ->
                     exampleUiState.addMessage(
-                        ChatMessage(me, content, getCurrTime())
+                        ChatMessage(me, mutableStateOf(content), getCurrTime())
                     )
+                    val glmq = ChatGLMQ(query = content, JSONArray())
+                    Thread{
+                        ApiExecutor.streamChat(glmq)
+                    }.start()
                 },
                 resetScroll = {
                     scope.launch {
