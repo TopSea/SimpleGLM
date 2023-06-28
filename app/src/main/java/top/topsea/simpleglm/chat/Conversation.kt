@@ -42,7 +42,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
-import top.topsea.simpleglm.settings.droid
 import top.topsea.simpleglm.settings.me
 
 const val ConversationTestTag = "ConversationTestTag"
@@ -64,11 +63,11 @@ fun ChatMessages(
                 .fillMaxSize()
         ) {
             for (index in chatMessages.indices) {
-                val prevAuthor = chatMessages.getOrNull(index - 1)?.author
-                val nextAuthor = chatMessages.getOrNull(index + 1)?.author
                 val content = chatMessages[index]
-                val firstMessageFromMe = prevAuthor == me
-                val lastMessageFromMe = nextAuthor == me
+
+                // 因为是倒序，所以 +1
+                val prevAuthor = chatMessages.getOrNull(index + 1)?.author
+                val lastMessageFromMe = prevAuthor == me
 
                 if (index == 0) {
                     item {
@@ -92,7 +91,6 @@ fun ChatMessages(
                             onAuthorClick = { name -> navigateToProfile(name) },
                             msg = content,
                             isUserMe = true,
-                            firstMessageFromMe = firstMessageFromMe,
                             lastMessageFromMe = lastMessageFromMe
                         )
                     }
@@ -102,7 +100,6 @@ fun ChatMessages(
                             onAuthorClick = { name -> navigateToProfile(name) },
                             msg = content,
                             isUserMe = false,
-                            firsMessageFromDroid = !firstMessageFromMe,
                             lastMessageFromDroid = !lastMessageFromMe
                         )
                     }
@@ -142,7 +139,6 @@ fun DroidMessageItem(
     onAuthorClick: (String) -> Unit,
     msg: ChatMessage,
     isUserMe: Boolean,
-    firsMessageFromDroid: Boolean,
     lastMessageFromDroid: Boolean
 ) {
     val borderColor = if (isUserMe) {
@@ -157,7 +153,6 @@ fun DroidMessageItem(
             // Avatar
             Image(
                 modifier = Modifier
-                    .clickable(onClick = { onAuthorClick(msg.author) })
                     .padding(horizontal = 16.dp)
                     .size(42.dp)
                     .border(1.5.dp, borderColor, CircleShape)
@@ -175,7 +170,6 @@ fun DroidMessageItem(
         DroidMessage(
             msg = msg,
             isUserMe = isUserMe,
-            firsMessageFromDroid = firsMessageFromDroid,
             lastMessageFromDroid = lastMessageFromDroid,
             authorClicked = onAuthorClick,
             modifier = Modifier
@@ -191,7 +185,6 @@ fun SelfMessageItem(
     onAuthorClick: (String) -> Unit,
     msg: ChatMessage,
     isUserMe: Boolean,
-    firstMessageFromMe: Boolean,
     lastMessageFromMe: Boolean
 ) {
     val borderColor = if (isUserMe) {
@@ -205,7 +198,6 @@ fun SelfMessageItem(
         SelfMessage(
             msg = msg,
             isUserMe = isUserMe,
-            isFirstMessageByAuthor = firstMessageFromMe,
             isLastMessageByAuthor = lastMessageFromMe,
             authorClicked = onAuthorClick,
             modifier = Modifier
@@ -216,7 +208,6 @@ fun SelfMessageItem(
             // Avatar
             Image(
                 modifier = Modifier
-                    .clickable(onClick = { onAuthorClick(msg.author) })
                     .padding(horizontal = 16.dp)
                     .size(42.dp)
                     .border(1.5.dp, borderColor, CircleShape)
@@ -238,7 +229,6 @@ fun SelfMessageItem(
 fun DroidMessage(
     msg: ChatMessage,
     isUserMe: Boolean,
-    firsMessageFromDroid: Boolean,
     lastMessageFromDroid: Boolean,
     authorClicked: (String) -> Unit,
     modifier: Modifier = Modifier
@@ -263,7 +253,6 @@ fun DroidMessage(
 fun SelfMessage(
     msg: ChatMessage,
     isUserMe: Boolean,
-    isFirstMessageByAuthor: Boolean,
     isLastMessageByAuthor: Boolean,
     authorClicked: (String) -> Unit,
     modifier: Modifier = Modifier
