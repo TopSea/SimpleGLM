@@ -37,6 +37,9 @@ interface ChatMessageDao {
     @Query("SELECT * FROM ChatMessage order by `index` desc limit 10")
     fun getLatest10(): List<ChatMessage>
 
+    @Query("SELECT * FROM ChatMessage WHERE `index` < (:before)  order by `index` desc limit 10")
+    fun get10History(before: Int): List<ChatMessage>
+
     @Insert
     fun insertAll(vararg chatMessages: ChatMessage)
     @Insert

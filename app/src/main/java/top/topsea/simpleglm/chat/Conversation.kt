@@ -26,6 +26,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -33,17 +34,24 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.LastBaseline
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
+import com.google.accompanist.swiperefresh.SwipeRefresh
+import com.google.accompanist.swiperefresh.SwipeRefreshIndicator
+import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import kotlinx.coroutines.launch
 import top.topsea.simpleglm.R
 import top.topsea.simpleglm.data.ChatMessage
+import top.topsea.simpleglm.data.ChatViewModel
+import top.topsea.simpleglm.messageState
 import top.topsea.simpleglm.settings.getFormatByDate
 import top.topsea.simpleglm.settings.me
 
@@ -57,27 +65,39 @@ fun ChatMessages(
     modifier: Modifier = Modifier
 ) {
     val scope = rememberCoroutineScope()
-    Box(modifier = modifier) {
-        LazyColumn(
-            reverseLayout = true,
-            state = scrollState,
-            modifier = Modifier
-                .testTag(ConversationTestTag)
-                .fillMaxSize()
-        ) {
-            for (index in chatMessages.indices) {
-                val content = chatMessages[index]
 
-                // 因为是倒序，所以 +1
-                val prevAuthor = chatMessages.getOrNull(index + 1)?.author
-                val lastMessageFromMe = prevAuthor == me
+    val refreshState by messageState!!.refresh.collectAsState()
+    val swipeRefresh= rememberSwipeRefreshState(isRefreshing = refreshState)
 
-                if (index == 0) {
-                    item {
-                        Spacer(modifier = Modifier.size(8.dp))
+    SwipeRefresh(
+        state = swipeRefresh,
+        onRefresh = {
+            //在下拉手势监听的回调中调用startRefresh()开启刷新
+            messageState!!.refreshHistory()
+        },
+        modifier = modifier
+    ) {
+        Box {
+            LazyColumn(
+                reverseLayout = true,
+                state = scrollState,
+                modifier = Modifier
+                    .testTag(ConversationTestTag)
+                    .fillMaxSize()
+            ) {
+                for (index in chatMessages.indices) {
+                    val content = chatMessages[index]
+
+                    // 因为是倒序，所以 +1
+                    val prevAuthor = chatMessages.getOrNull(index + 1)?.author
+                    val lastMessageFromMe = prevAuthor == me
+
+                    if (index == 0) {
+                        item {
+                            Spacer(modifier = Modifier.size(8.dp))
+                        }
                     }
-                }
-                // Hardcode day dividers for simplicity
+                    // Hardcode day dividers for simplicity
 //                if (index == chatMessages.size - 1) {
 //                    item {
 //                        DayHeader("20 Aug")
@@ -88,52 +108,53 @@ fun ChatMessages(
 //                    }
 //                }
 
-                if (content.author == me) {
-                    item {
-                        SelfMessageItem(
-                            onAuthorClick = { name -> navigateToProfile(name) },
-                            msg = content,
-                            isUserMe = true,
-                            lastMessageFromMe = lastMessageFromMe
-                        )
-                    }
-                } else {
-                    item {
-                        DroidMessageItem(
-                            onAuthorClick = { name -> navigateToProfile(name) },
-                            msg = content,
-                            isUserMe = false,
-                            lastMessageFromDroid = !lastMessageFromMe
-                        )
+                    if (content.author == me) {
+                        item {
+                            SelfMessageItem(
+                                onAuthorClick = { name -> navigateToProfile(name) },
+                                msg = content,
+                                isUserMe = true,
+                                lastMessageFromMe = lastMessageFromMe
+                            )
+                        }
+                    } else {
+                        item {
+                            DroidMessageItem(
+                                onAuthorClick = { name -> navigateToProfile(name) },
+                                msg = content,
+                                isUserMe = false,
+                                lastMessageFromDroid = !lastMessageFromMe
+                            )
+                        }
                     }
                 }
             }
-        }
-        // Jump to bottom button shows up when user scrolls past a threshold.
-        // Convert to pixels:
-        val jumpThreshold = with(LocalDensity.current) {
-            JumpToBottomThreshold.toPx()
-        }
-
-        // Show the button if the first visible item is not the first one or if the offset is
-        // greater than the threshold.
-        val jumpToBottomButtonEnabled by remember {
-            derivedStateOf {
-                scrollState.firstVisibleItemIndex != 0 ||
-                    scrollState.firstVisibleItemScrollOffset > jumpThreshold
+            // Jump to bottom button shows up when user scrolls past a threshold.
+            // Convert to pixels:
+            val jumpThreshold = with(LocalDensity.current) {
+                JumpToBottomThreshold.toPx()
             }
-        }
 
-        JumpToBottom(
-            // Only show if the scroller is not at the bottom
-            enabled = jumpToBottomButtonEnabled,
-            onClicked = {
-                scope.launch {
-                    scrollState.animateScrollToItem(0)
+            // Show the button if the first visible item is not the first one or if the offset is
+            // greater than the threshold.
+            val jumpToBottomButtonEnabled by remember {
+                derivedStateOf {
+                    scrollState.firstVisibleItemIndex != 0 ||
+                            scrollState.firstVisibleItemScrollOffset > jumpThreshold
                 }
-            },
-            modifier = Modifier.align(Alignment.BottomCenter)
-        )
+            }
+
+            JumpToBottom(
+                // Only show if the scroller is not at the bottom
+                enabled = jumpToBottomButtonEnabled,
+                onClicked = {
+                    scope.launch {
+                        scrollState.animateScrollToItem(0)
+                    }
+                },
+                modifier = Modifier.align(Alignment.BottomCenter)
+            )
+        }
     }
 }
 

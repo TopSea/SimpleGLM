@@ -6,6 +6,10 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.toMutableStateList
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.launch
 import top.topsea.simpleglm.R
 import top.topsea.simpleglm.TAG
 import top.topsea.simpleglm.data.ChatMessage
@@ -20,9 +24,15 @@ class ConversationUiState(
     val chatMessages: List<ChatMessage> = _Chat_messages
     val viewModel = ChatViewModel(context)
 
+    //使用MutableStateFlow创建展示的状态值，布尔类型，
+    private var _refresh= MutableStateFlow(false)
+    //view层不能对它直接操作我们要通过另一个变量暴露出去让view层只能读取
+    val refresh =_refresh
+
     fun addMessage(msg: ChatMessage) {
         Log.d(TAG, "addMessage: ${msg}")
         _Chat_messages.add(0, msg) // 因为是倒序，所以往前加
+        viewModel.insertChatMessage(msg)    // 我的消息直接入库
     }
 
     fun addMessageGLM(msg: ChatMessage, finished: Boolean) {
@@ -31,6 +41,13 @@ class ConversationUiState(
         if (finished) viewModel.insertChatMessage(msg) else _Chat_messages.add(0, msg) // 因为是倒序，所以往前加
     }
 
+    fun refreshHistory() {
+        _refresh.value=true
+        val finalIndex = _Chat_messages[_Chat_messages.lastIndex].index!!
+        val historyMessages = viewModel.get10History(finalIndex)
+        _Chat_messages.addAll(historyMessages)
+        _refresh.value=false
+    }
 }
 
 //@Immutable
