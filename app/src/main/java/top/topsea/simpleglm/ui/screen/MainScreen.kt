@@ -39,13 +39,12 @@ import org.json.JSONArray
 import top.topsea.simpleglm.R
 import top.topsea.simpleglm.api.ApiExecutor
 import top.topsea.simpleglm.api.ChatGLMQ
-import top.topsea.simpleglm.chat.ConversationUiState
-import top.topsea.simpleglm.chat.ChatMessage
 import top.topsea.simpleglm.chat.ChatMessages
+import top.topsea.simpleglm.chat.ConversationUiState
 import top.topsea.simpleglm.chat.UserInput
-import top.topsea.simpleglm.chat.exampleUiState
-import top.topsea.simpleglm.settings.getCurrTime
+import top.topsea.simpleglm.data.ChatMessage
 import top.topsea.simpleglm.settings.me
+import java.sql.Date
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -72,9 +71,13 @@ fun MainScreen(
             )
             UserInput(
                 onMessageSent = { content ->
-                    exampleUiState.addMessage(
-                        ChatMessage(me, mutableStateOf(content), getCurrTime())
+                    val mes = ChatMessage(
+                        null,
+                        mutableStateOf(content),
+                        Date(System.currentTimeMillis()),
+                        me
                     )
+                    uiState.addMessage(mes)
                     val glmq = ChatGLMQ(query = content, JSONArray())
                     Thread{
                         ApiExecutor.streamChat(glmq)

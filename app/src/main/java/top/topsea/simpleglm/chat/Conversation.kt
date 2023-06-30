@@ -42,6 +42,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
+import top.topsea.simpleglm.R
+import top.topsea.simpleglm.data.ChatMessage
+import top.topsea.simpleglm.settings.getFormatByDate
 import top.topsea.simpleglm.settings.me
 
 const val ConversationTestTag = "ConversationTestTag"
@@ -159,7 +162,7 @@ fun DroidMessageItem(
                     .border(3.dp, MaterialTheme.colorScheme.surface, CircleShape)
                     .clip(CircleShape)
                     .align(Alignment.Top),
-                painter = painterResource(id = msg.authorImage),
+                painter = painterResource(id = if (msg.author == me) R.drawable.baseline_perm else R.drawable.baseline_android),
                 contentScale = ContentScale.Crop,
                 contentDescription = null,
             )
@@ -214,7 +217,7 @@ fun SelfMessageItem(
                     .border(3.dp, MaterialTheme.colorScheme.surface, CircleShape)
                     .clip(CircleShape)
                     .align(Alignment.Top),
-                painter = painterResource(id = msg.authorImage),
+                painter = painterResource(id = if (msg.author == me) R.drawable.baseline_perm else R.drawable.baseline_android),
                 contentScale = ContentScale.Crop,
                 contentDescription = null,
             )
@@ -286,7 +289,7 @@ private fun DroidTimestamp(msg: ChatMessage) {
         )
         Spacer(modifier = Modifier.width(8.dp))
         Text(
-            text = msg.timestamp,
+            text = getFormatByDate(msg.date),
             style = MaterialTheme.typography.bodySmall,
             modifier = Modifier.alignBy(LastBaseline),
             color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -300,7 +303,7 @@ private fun SelfTimestamp(msg: ChatMessage) {
     Box(modifier = Modifier.fillMaxWidth()) {
         Row(modifier = Modifier.align(Alignment.CenterEnd)) {
             Text(
-                text = msg.timestamp,
+                text = getFormatByDate(msg.date),
                 style = MaterialTheme.typography.bodySmall,
                 modifier = Modifier.alignBy(LastBaseline),
                 color = MaterialTheme.colorScheme.onSurfaceVariant

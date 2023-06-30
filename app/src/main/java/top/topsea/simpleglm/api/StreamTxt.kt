@@ -6,15 +6,15 @@ import okhttp3.ResponseBody
 import org.json.JSONObject
 import retrofit2.Converter
 import retrofit2.Retrofit
-import top.topsea.simpleglm.TAG
-import top.topsea.simpleglm.chat.ChatMessage
-import top.topsea.simpleglm.chat.exampleUiState
+import top.topsea.simpleglm.data.ChatMessage
+import top.topsea.simpleglm.messageState
 import top.topsea.simpleglm.settings.droid
 import java.io.BufferedReader
 import java.io.IOException
 import java.io.InputStream
 import java.io.InputStreamReader
 import java.lang.reflect.Type
+import java.sql.Date
 
 
 abstract class StreamTxtResponseConverter<T> : Converter<ResponseBody, T> {
@@ -50,8 +50,8 @@ class StreamResponseConverter : StreamTxtResponseConverter<ChatGLMA>() {
         val response = ""
         val responseEmoji = ""
 //        val glma = ChatGLMA(null, null, null, null, false)
-        val chatA = ChatMessage(droid, mutableStateOf(""), "")
-        exampleUiState.addMessage(chatA)
+        val chatA = ChatMessage(null, mutableStateOf(""), Date(System.currentTimeMillis()), droid)
+        messageState!!.addMessageGLM(chatA, false)
         try {
             reader.forEachLine { line ->
                 if (line.contains("data: {")){
@@ -69,6 +69,8 @@ class StreamResponseConverter : StreamTxtResponseConverter<ChatGLMA>() {
                         } else {
                             chatA.content.value = chatA.content.value + jsonData.getString("delta")
                         }
+                    } else {
+                        messageState!!.addMessageGLM(chatA, true)
                     }
                 }
             }
