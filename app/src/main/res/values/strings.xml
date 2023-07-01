@@ -26,5 +26,6 @@
 
     <!--MMKV字符串-->
     <string name="server_ip">Server_IP</string>
+    <string name="chat_history">Chat_History</string>
     <string name="voice_chat">Voice_Chat</string>
 </resources>

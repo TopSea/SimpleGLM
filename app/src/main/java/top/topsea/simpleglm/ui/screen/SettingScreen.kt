@@ -2,6 +2,7 @@ package top.topsea.simpleglm.ui.screen
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -17,6 +18,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.material3.Button
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
@@ -118,16 +120,14 @@ fun BasicSettingBlock(
             Text(
                 text = setting.commentName,
                 fontSize = TextUnit(value = 16F, type = TextUnitType.Sp),
-                modifier = Modifier.padding(vertical = 4.dp, horizontal = 8.dp).align(Alignment.CenterStart),
+                modifier = Modifier
+                    .padding(vertical = 4.dp, horizontal = 8.dp)
+                    .align(Alignment.CenterStart),
                 fontWeight = FontWeight.Bold
             )
 
         }
-        Box(modifier = Modifier
-            .height(1.dp)
-            .align(Alignment.CenterHorizontally)
-            .fillMaxWidth(0.95F)
-            .background(color = Color.Black))
+        SplitLine(color = Color.Black)
         Column(modifier = Modifier.padding(vertical = 8.dp, horizontal = 16.dp)) {
             setting.settingsUI()
         }
@@ -141,16 +141,18 @@ fun DefaultSettings() {
 
     val kv = MMKV.defaultMMKV()
     val serverIP: String = kv.decodeString(stringResource(id = R.string.server_ip), "http:192.168.0.107:8888")!!
+    val chatHistory: Boolean = kv.decodeBool(stringResource(id = R.string.chat_history), true)
     var serverIPStr by remember { mutableStateOf(serverIP) }
 
 
     var enableServerIP by remember { mutableStateOf(true) }
+    var enableHistory by remember { mutableStateOf(chatHistory) }
     var textColor by remember {
         mutableStateOf(Color.LightGray)
     }
 
     var btn by remember {
-        mutableStateOf("Modify")
+        mutableStateOf("修改")
     }
     Column(modifier = Modifier.fillMaxWidth()) {
         Box(modifier = Modifier.fillMaxWidth()) {
@@ -195,6 +197,32 @@ fun DefaultSettings() {
                 Text(text = btn)
             }
         }
+        SplitLine(color = Color.LightGray)
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(
+                text = "启用聊天历史",
+                modifier = Modifier.align(Alignment.CenterVertically),
+                fontSize = TextUnit(value = 13F, type = TextUnitType.Sp)
+            )
 
+            Checkbox(
+                checked = enableHistory,
+                onCheckedChange = {
+                    enableHistory = !enableHistory
+                    kv.encode(context.resources.getString(R.string.chat_history), enableHistory)
+                }
+            )
+        }
     }
+}
+
+@Composable
+fun SplitLine(color: Color) {
+    Box(modifier = Modifier
+        .fillMaxWidth()
+        .height(1.dp)
+        .background(color = color))
 }

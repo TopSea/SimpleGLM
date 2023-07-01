@@ -2,7 +2,9 @@ package top.topsea.simpleglm.api
 
 import android.util.Log
 import androidx.compose.runtime.mutableStateOf
+import com.tencent.mmkv.MMKV
 import okhttp3.ResponseBody
+import org.json.JSONArray
 import org.json.JSONObject
 import retrofit2.Converter
 import retrofit2.Retrofit
@@ -47,8 +49,7 @@ class StreamResponseConverter : StreamTxtResponseConverter<ChatGLMA>() {
 
     private fun stream2String(inputStream: InputStream) {
         val reader = BufferedReader(InputStreamReader(inputStream))
-        val response = ""
-        val responseEmoji = ""
+        val enabledHistory = MMKV.defaultMMKV().decodeBool("Chat_History", true)
 //        val glma = ChatGLMA(null, null, null, null, false)
         val chatA = ChatMessage(null, mutableStateOf(""), Date(System.currentTimeMillis()), droid)
         messageState!!.addMessageGLM(chatA, false)
@@ -70,6 +71,9 @@ class StreamResponseConverter : StreamTxtResponseConverter<ChatGLMA>() {
                             chatA.content.value = chatA.content.value + jsonData.getString("delta")
                         }
                     } else {
+                        if (enabledHistory) {
+                            history = jsonData.getJSONArray("history")
+                        }
                         messageState!!.addMessageGLM(chatA, true)
                     }
                 }

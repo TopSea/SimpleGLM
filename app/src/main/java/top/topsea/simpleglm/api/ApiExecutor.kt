@@ -4,12 +4,14 @@ import android.util.Log
 import com.tencent.mmkv.MMKV
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody.Companion.toRequestBody
+import org.json.JSONArray
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
 import top.topsea.simpleglm.TAG
 
+var history = JSONArray()
 object ApiExecutor {
     private val kv = MMKV.defaultMMKV()
     private val serverIP = kv.decodeString("Server_IP", "http:192.168.0.107:8888")!!
@@ -24,6 +26,10 @@ object ApiExecutor {
                 }
             })
             .build()
+
+        if (kv.decodeBool("Chat_History", true)) {
+            glmq.history = history
+        }
 
         val request: ChatdroidApi = retrofit.create(ChatdroidApi::class.java)
 
